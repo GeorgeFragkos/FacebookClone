@@ -3,10 +3,12 @@ const cors = require("cors");
 const { readdirSync } = require("fs");
 const dotenv = require("dotenv");
 const mongoose = require("mongoose");
+const bodyParser = require("body-parser");
 dotenv.config();
 
 const app = express();
 
+app.use(bodyParser.json());
 app.use(cors());
 
 //routes
