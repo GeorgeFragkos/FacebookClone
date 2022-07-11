@@ -6,6 +6,7 @@ const {
 const bcrypt = require("bcrypt");
 const User = require("../models/User");
 const { generateToken } = require("../helpers/tokens");
+const { sendVerificationEmail } = require("../helpers/mailer");
 exports.register = async (req, res) => {
   try {
     const {
@@ -68,7 +69,19 @@ exports.register = async (req, res) => {
       "30m"
     );
 
-    return res.json(user);
+    const url = `${process.env.BASE_URL}/activate/${emailVerificationToken}`;
+    sendVerificationEmail(user.email, user.first_name, url);
+    const token = generateToken({ id: user._id.toString() }, "7d");
+    res.send({
+      id: user._id,
+      username: user.username,
+      picture: user.picture,
+      first_name: user.first_name,
+      last_name: user.last_name,
+      token: token,
+      verified: user.verified,
+      message: "Register success! please activate your email to start",
+    });
   } catch (error) {
     return res.status(500).json({ message: error.message });
   }
