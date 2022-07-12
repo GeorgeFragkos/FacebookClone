@@ -3,6 +3,7 @@ const {
   validateLength,
   validateUsername,
 } = require("../helpers/validation");
+const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const User = require("../models/User");
 const { generateToken } = require("../helpers/tokens");
@@ -84,5 +85,51 @@ exports.register = async (req, res) => {
     });
   } catch (error) {
     return res.status(500).json({ message: error.message });
+  }
+};
+
+exports.activateAccount = async (req, res) => {
+  try {
+    const { token } = req.body;
+    const user = jwt.verify(token, process.env.TOKEN_SECRET);
+    const check = await User.findById(user.id);
+    if (check.verified == true) {
+      return res
+        .status(400)
+        .json({ message: "this email is already activated" });
+    }
+    await User.findByIdAndUpdate(user.id, { verified: true });
+    return res
+      .status(200)
+      .json({ message: "Account has been successfully activated" });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+exports.login = async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(400).json({ message: "Invalid email/password" });
+    }
+    const check = await bcrypt.compare(password, user.password);
+    if (!check) {
+      return res.status(400).json({ message: "Invalid email/password" });
+    }
+    const token = generateToken({ id: user._id.toString() }, "7d");
+    res.send({
+      id: user._id,
+      username: user.username,
+      picture: user.picture,
+      first_name: user.first_name,
+      last_name: user.last_name,
+      token: token,
+      verified: user.verified,
+      message: "Login successfully!",
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
   }
 };
