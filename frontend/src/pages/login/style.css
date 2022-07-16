@@ -121,7 +121,7 @@
   flex-direction: column;
   gap: 10px;
 }
-reg_col {
+.reg_col {
   position: relative;
   align-self: flex-start;
   margin-bottom: 10px;
@@ -157,7 +157,7 @@ reg_col {
   width: 90px;
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: space-between;
   font-size: 16px;
   color: var(--color-primary);
   border-radius: 5px;
@@ -229,10 +229,44 @@ reg_col {
 
 /* -------Footer-------*/
 
+/*---------Date of births adn gender errors ----*/
+.reg_grid .input_error {
+  width: 300px;
+  position: absolute;
+  top: 70px;
+}
+.input_error_select_large {
+  left: -97%;
+  top: 17px !important;
+}
+
+/*---------Date of births adn gender errors ----*/
+/*------error and success styles-----*/
+.error_text {
+  color: #b94a48;
+}
+.success_text {
+  color: var(--green-color);
+}
+
+/*------error and success styles-----*/
 /*-----Media queries ------- */
 @media (min-width: 539px) {
   .login_footer_wrap {
     max-width: 520px;
+  }
+  .register {
+    width: 400px;
+  }
+  .register_line {
+    flex-direction: row;
+  }
+  .reg_grid select,
+  .reg_grid label {
+    width: 110px;
+  }
+  .reg_grid .input_error {
+    width: 350px;
   }
 }
 @media (min-width: 650px) {
