@@ -1,25 +1,66 @@
 import { Form, Formik } from "formik";
 import RegisterInput from "../inputs/registerInput";
 import { useState } from "react";
-
-const setUserInfos = {
-  first_name: "",
-  last_name: "",
-  email: "",
-  password: "",
-  bYear: "",
-  bMonth: "",
-  bDay: "",
-  gender: "",
-};
+import * as Yup from "yup";
 
 export default function RegisterForm() {
+  const setUserInfos = {
+    first_name: "",
+    last_name: "",
+    email: "",
+    password: "",
+    bYear: new Date().getFullYear(),
+    bMonth: new Date().getMonth() + 1,
+    bDay: new Date().getDay(),
+    gender: "",
+  };
+
   const [user, setUser] = useState(setUserInfos);
+
+  const {
+    first_name,
+    last_name,
+    email,
+    password,
+    bYear,
+    bMonth,
+    bDay,
+    gender,
+  } = user;
 
   const handleRegisterChange = (e) => {
     const { name, value } = e.target;
     setUser({ ...user, [name]: value });
   };
+
+  const years = Array.from(
+    new Array(108),
+    (val, index) => setUserInfos.bYear - index
+  );
+  const months = Array.from(new Array(12), (val, index) => index + 1);
+
+  const getDays = () => {
+    return new Date(bYear, bMonth, 0).getDate();
+  };
+  const days = Array.from(new Array(getDays()), (value, index) => index + 1);
+
+  const registerValidation = Yup.object({
+    first_name: Yup.string()
+      .required("What's your first name")
+      .min(2, "First name must between 2 and 16 characters")
+      .max(16, "First name must between 2 and 16 characters")
+      .matches(/^[aA-zZ]+$/, "Numbers and special characters are not allowed"),
+    last_name: Yup.string()
+      .required("What's your Surname")
+      .min(2, "Surname  must between 2 and 16 characters")
+      .max(16, "Surname must between 2 and 16 characters")
+      .matches(/^[aA-zZ]+$/, "Numbers and special characters are not allowed"),
+    email: Yup.string().required().email("Enter a valid email address"),
+    password: Yup.string()
+      .required()
+      .min(6, "Password must be at least 6 characters"),
+  });
+
   return (
     <div className="blur">
       <div className="register">
@@ -28,7 +69,20 @@ export default function RegisterForm() {
           <span>Sign Up</span>
           <span>it's quick and easy</span>
         </div>
-        <Formik>
+        <Formik
+          enableReinitialize
+          initialValues={{
+            first_name,
+            last_name,
+            email,
+            password,
+            bYear,
+            bMonth,
+            bDay,
+            gender,
+          }}
+          validationSchema={registerValidation}
+        >
           {(formik) => (
             <Form className="register_form">
               <div className="register_line">
@@ -66,14 +120,38 @@ export default function RegisterForm() {
                   Date of birth <i className="info_icon"></i>
                 </div>
                 <div className="reg_grid">
-                  <select name="bDay">
-                    <option>15</option>
+                  <select
+                    name="bDay"
+                    value={bDay}
+                    onChange={handleRegisterChange}
+                  >
+                    {days.map((day, i) => (
+                      <option value={day} key={i}>
+                        {day}
+                      </option>
+                    ))}
                   </select>
-                  <select name="bYear">
-                    <option>15</option>
+                  <select
+                    name="bMonth"
+                    value={bMonth}
+                    onChange={handleRegisterChange}
+                  >
+                    {months.map((month, i) => (
+                      <option value={month} key={i}>
+                        {month}
+                      </option>
+                    ))}
                   </select>
-                  <select name="bMonth">
-                    <option>15</option>
+                  <select
+                    name="bYear"
+                    value={bYear}
+                    onChange={handleRegisterChange}
+                  >
+                    {years.map((year, i) => (
+                      <option value={year} key={i}>
+                        {year}
+                      </option>
+                    ))}
                   </select>
                 </div>
                 <div className="reg_col">
