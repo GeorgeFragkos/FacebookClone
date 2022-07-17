@@ -2,25 +2,24 @@ import { Form, Formik } from "formik";
 import { Link } from "react-router-dom";
 import LoginInput from "../inputs/loginInput";
 import { useState } from "react";
-import * as Yup from "yup";
 import axios from "axios";
 import { useDispatch } from "react-redux";
 import Cookies from "js-cookie";
 import { useNavigate } from "react-router-dom";
 import DotLoader from "react-spinners/DotLoader";
-const loginInfos = {
-  email: "",
-  password: "",
-};
+import loginDataValidation from "../../validation/loginDataValidation";
 
 export const LoginForm = ({ setVisible }) => {
+  const loginInfos = {
+    email: "",
+    password: "",
+  };
   const [login, setLogin] = useState(loginInfos);
-  const navigate = useNavigate();
-  const dispatch = useDispatch();
   const { email, password } = login;
 
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
   const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
   const [loading, setLoading] = useState(false);
   const loginSubmit = async () => {
     try {
@@ -46,13 +45,6 @@ export const LoginForm = ({ setVisible }) => {
     const { name, value } = e.target;
     setLogin({ ...login, [name]: value });
   };
-  const loginValidation = Yup.object({
-    email: Yup.string()
-      .required("Email address is required")
-      .email("Must be a valid email")
-      .max(100),
-    password: Yup.string().required("Password is required"),
-  });
 
   return (
     <div className="login_wrap">
@@ -71,7 +63,7 @@ export const LoginForm = ({ setVisible }) => {
               email,
               password,
             }}
-            validationSchema={loginValidation}
+            validationSchema={loginDataValidation}
             onSubmit={() => {
               loginSubmit();
             }}

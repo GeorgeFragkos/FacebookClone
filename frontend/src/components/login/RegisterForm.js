@@ -1,7 +1,6 @@
 import { Form, Formik } from "formik";
 import RegisterInput from "../inputs/registerInput";
 import { useState } from "react";
-import * as Yup from "yup";
 import DateOfBirthSelect from "./DateOfBirthSelect";
 import GenderSelect from "./GenderSelect";
 import DotLoader from "react-spinners/DotLoader";
@@ -9,10 +8,9 @@ import axios from "axios";
 import { useDispatch } from "react-redux";
 import Cookies from "js-cookie";
 import { useNavigate } from "react-router-dom";
+import registerDataValidation from "../../validation/registerDataValidation";
 
 export default function RegisterForm({ setVisible }) {
-  const navigate = useNavigate();
-  const dispatch = useDispatch();
   const setUserInfos = {
     first_name: "",
     last_name: "",
@@ -23,13 +21,26 @@ export default function RegisterForm({ setVisible }) {
     bDay: new Date().getDay(),
     gender: "",
   };
-
   const [user, setUser] = useState(setUserInfos);
+  const {
+    first_name,
+    last_name,
+    email,
+    password,
+    bYear,
+    bMonth,
+    bDay,
+    gender,
+  } = user;
 
+  const [dateError, setDateError] = useState("");
+  const [genderError, setGenderError] = useState("");
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [loading, setLoading] = useState(false);
 
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
   const registerSubmit = async () => {
     setLoading(true);
     try {
@@ -62,17 +73,6 @@ export default function RegisterForm({ setVisible }) {
     }
   };
 
-  const {
-    first_name,
-    last_name,
-    email,
-    password,
-    bYear,
-    bMonth,
-    bDay,
-    gender,
-  } = user;
-
   const handleRegisterChange = (e) => {
     const { name, value } = e.target;
     setUser({ ...user, [name]: value });
@@ -89,24 +89,6 @@ export default function RegisterForm({ setVisible }) {
   };
   const days = Array.from(new Array(getDays()), (value, index) => index + 1);
 
-  const registerValidation = Yup.object({
-    first_name: Yup.string()
-      .required("What's your first name")
-      .min(2, "First name must between 2 and 16 characters")
-      .max(16, "First name must between 2 and 16 characters")
-      .matches(/^[aA-zZ]+$/, "Numbers and special characters are not allowed"),
-    last_name: Yup.string()
-      .required("What's your Surname")
-      .min(2, "Surname  must between 2 and 16 characters")
-      .max(16, "Surname must between 2 and 16 characters")
-      .matches(/^[aA-zZ]+$/, "Numbers and special characters are not allowed"),
-    email: Yup.string().required().email("Enter a valid email address"),
-    password: Yup.string()
-      .required()
-      .min(6, "Password must be at least 6 characters"),
-  });
-  const [dateError, setDateError] = useState("");
-  const [genderError, setGenderError] = useState("");
   return (
     <div className="blur">
       <div className="register">
@@ -127,7 +109,7 @@ export default function RegisterForm({ setVisible }) {
             bDay,
             gender,
           }}
-          validationSchema={registerValidation}
+          validationSchema={registerDataValidation}
           onSubmit={() => {
             let current_date = new Date();
             let picked_date = new Date(bYear, bMonth - 1, bDay);
