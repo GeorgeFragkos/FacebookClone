@@ -17,7 +17,6 @@ import { useSelector } from "react-redux";
 
 export default function Header() {
   const { user } = useSelector((user) => ({ ...user }));
-  console.log(user);
   const color = "#65676b";
   return (
     <header>
