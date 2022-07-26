@@ -8,11 +8,11 @@ export const Home = () => {
   useClickOutside(el, () => {
     setVisible(false);
   });
+  // {visible && <div className="card" ref={el}></div>}
 
   return (
     <div>
       <Header />
-      {visible && <div className="card" ref={el}></div>}
     </div>
   );
 };

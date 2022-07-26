@@ -14,10 +14,21 @@ import {
   ArrowDown,
 } from "../../svg";
 import { useSelector } from "react-redux";
+import SearchMenu from "./SearchMenu";
+import { useRef, useState } from "react";
+import AllMenu from "./AllMenu";
+import useClickOutside from "../../helpers/clickOutside";
 
 export default function Header() {
   const { user } = useSelector((user) => ({ ...user }));
   const color = "#65676b";
+  const [showSearchMenu, setShowSearchMenu] = useState(false);
+  const [showAllMenu, setShowAllMenu] = useState(false);
+  const allMenu = useRef(null);
+  useClickOutside(allMenu, () => {
+    setShowAllMenu(false);
+  });
+
   return (
     <header>
       <div className="header_left">
@@ -26,7 +37,12 @@ export default function Header() {
             <Logo />
           </div>
         </Link>
-        <div className="search search1">
+        <div
+          className="search search1"
+          onClick={() => {
+            setShowSearchMenu(true);
+          }}
+        >
           <Search color={color} />
           <input
             type="text"
@@ -35,6 +51,9 @@ export default function Header() {
           />
         </div>
       </div>
+      {showSearchMenu && (
+        <SearchMenu color={color} setShowSearchMenu={setShowSearchMenu} />
+      )}
       <div className="header_middle">
         <Link to="/" className="middle_icon active">
           <HomeActive />
@@ -58,8 +77,15 @@ export default function Header() {
           <img src={user?.picture} />
           <span>{user?.first_name}</span>
         </Link>
-        <div className="circle_icon hover1">
+        <div
+          className="circle_icon hover1"
+          onClick={() => {
+            setShowAllMenu((prev) => !prev);
+          }}
+          ref={allMenu}
+        >
           <Menu />
+          {showAllMenu && <AllMenu />}
         </div>
         <div className="circle_icon hover1">
           <Messenger />
