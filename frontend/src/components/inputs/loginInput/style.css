@@ -20,18 +20,8 @@
 .input_wrap input:focus {
   border-color: var(--blue-color);
 }
-
 .input_error_border {
   border-color: #b94a48 !important;
-}
-
-.error_icon {
-  background-image: url(../../../../public/icons/icons10.png);
-  background-size: auto;
-  background-repeat: no-repeat;
-  display: inline-block;
-  height: 21px;
-  width: 21px;
 }
 .input_wrap i {
   position: absolute;
@@ -42,7 +32,7 @@
 .input_error {
   position: relative;
   padding: 15px 10px;
-  background-color: #b94a48;
+  background: #b94a48;
   width: 100%;
   color: #fff;
   font-size: 13px;
@@ -54,21 +44,20 @@
   border-right: 10px solid transparent;
   border-left: 10px solid transparent;
   position: absolute;
-  bottom: -9px;
+  bottom: -10px;
 }
 .error_arrow_bottom {
   border-bottom: 10px solid #b94a48;
   border-right: 10px solid transparent;
   border-left: 10px solid transparent;
   position: absolute;
-  top: -9px;
+  top: -10px;
 }
-
 .input_error_desktop {
   position: absolute;
   width: 300px;
   left: -19.5rem;
-  top: -2px;
+  top: -3px;
 }
 .error_arrow_left {
   border-left: 10px solid #b94a48;
