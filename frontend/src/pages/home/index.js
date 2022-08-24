@@ -6,6 +6,7 @@ import LeftHome from "../../components/home/left";
 import RightHome from "../../components/home/right";
 import SendVerification from "../../components/home/sendVerification";
 import Stories from "../../components/home/stories";
+import CreatePostPopup from "../../components/createPostPopup/index";
 import "./style.css";
 export default function Home() {
   const { user } = useSelector((state) => ({ ...state }));
@@ -19,6 +20,7 @@ export default function Home() {
         <CreatePost user={user} />
       </div>
       <RightHome user={user} />
+      <CreatePostPopup user={user} />
     </div>
   );
 }
