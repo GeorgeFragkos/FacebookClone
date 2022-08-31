@@ -1,5 +1,6 @@
 const express = require("express");
 const cors = require("cors");
+const fileUpload = require("express-fileupload");
 const { readdirSync } = require("fs");
 const dotenv = require("dotenv");
 const mongoose = require("mongoose");
@@ -10,7 +11,11 @@ const app = express();
 
 app.use(bodyParser.json());
 app.use(cors());
-
+app.use(
+  fileUpload({
+    useTempFiles: true,
+  })
+);
 //routes
 //configure all routes in pipeline via filesystem
 readdirSync("./routes").map((r) => {

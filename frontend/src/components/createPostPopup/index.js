@@ -1,18 +1,94 @@
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import "./style.css";
-import Picker from "emoji-picker-react";
 import EmojiPickerBackgrounds from "./EmojiPickerBackgrounds";
 import AddToYourPost from "./AddToYourPost";
-export default function CreatePostPopup({ user }) {
+import ImagePreview from "./ImagePreview";
+import useClickOutside from "../../helpers/clickOutside";
+import { createPost } from "../../functions/post";
+import PulseLoader from "react-spinners/PulseLoader";
+import { useDispatch } from "react-redux";
+import PostError from "./PostError";
+import dataURItoBlob from "../../helpers/dataURItoBlob";
+import { uploadImages } from "../../functions/uploadImages";
+export default function CreatePostPopup({ user, setVisible }) {
+  const dispatch = useDispatch();
+  const popup = useRef(null);
   const [text, setText] = useState("");
   const [showPrev, setShowPrev] = useState(false);
-  const textRef = useRef(null);
-
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [images, setImages] = useState([]);
+  const [background, setBackground] = useState("");
+  useClickOutside(popup, () => {
+    setVisible(false);
+  });
+  const postSubmit = async () => {
+    if (background) {
+      setLoading(true);
+      const response = await createPost(
+        null,
+        background,
+        text,
+        null,
+        user.id,
+        user.token
+      );
+      setLoading(false);
+      if (response === "ok") {
+        setBackground("");
+        setText("");
+        setVisible(false);
+      } else {
+        setError(response);
+      }
+    } else if (images && images.length) {
+      setLoading(true);
+      const postImages = images.map((img) => {
+        return dataURItoBlob(img);
+      });
+      const path = `${user.username}/post Images`;
+      let formData = new FormData();
+      formData.append("path", path);
+      postImages.forEach((image) => {
+        formData.append("file", image);
+      });
+      const response = await uploadImages(formData, path, user.token);
+      await createPost(null, null, text, response, user.id, user.token);
+      setLoading(false);
+      setText("");
+      setImages("");
+      setVisible(false);
+    } else if (text) {
+      setLoading(true);
+      const response = await createPost(
+        null,
+        null,
+        text,
+        null,
+        user.id,
+        user.token
+      );
+      setLoading(false);
+      if (response === "ok") {
+        setBackground("");
+        setText("");
+        setVisible(false);
+      } else {
+        setError(response);
+      }
+    }
+  };
   return (
     <div className="blur">
-      <div className="postBox">
+      <div className="postBox" ref={popup}>
+        {error && <PostError error={error} setError={setError} />}
         <div className="box_header">
-          <div className="small_circle">
+          <div
+            className="small_circle"
+            onClick={() => {
+              setVisible(false);
+            }}
+          >
             <i className="exit_icon"></i>
           </div>
           <span>Create Post</span>
@@ -31,27 +107,38 @@ export default function CreatePostPopup({ user }) {
           </div>
         </div>
 
-        {!showPrev && (
+        {!showPrev ? (
           <>
-            <div className="flex_center">
-              <textarea
-                ref={textRef}
-                maxLength="100"
-                value={text}
-                placeholder={`What's on your mind, ${user.first_name}`}
-                className="post_input"
-                onChange={(e) => setText(e.target.value)}
-              ></textarea>
-            </div>
             <EmojiPickerBackgrounds
               text={text}
-              textRef={textRef}
+              user={user}
               setText={setText}
+              showPrev={showPrev}
+              setBackground={setBackground}
+              background={background}
             />
           </>
+        ) : (
+          <ImagePreview
+            text={text}
+            user={user}
+            setText={setText}
+            showPrev={showPrev}
+            images={images}
+            setImages={setImages}
+            setShowPrev={setShowPrev}
+          />
         )}
-        <AddToYourPost />
-        <button className="post_submit">Post</button>
+        <AddToYourPost setShowPrev={setShowPrev} />
+        <button
+          className="post_submit"
+          onClick={() => {
+            postSubmit();
+          }}
+          disabled={loading}
+        >
+          {loading ? <PulseLoader color="#fff" size={5} /> : "Post"}
+        </button>
       </div>
     </div>
   );
